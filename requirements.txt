@@ -1,0 +1,11 @@
+# Core dependencies
+litellm
+pandas
+beautifulsoup4
+requests
+PyPDF2
+
+# sqlite3 is part of the Python standard library (no separate install needed)
+
+# For development and testing
+pytest
