@@ -3,10 +3,10 @@ from setuptools import setup, find_packages
 setup(
     name="python-weaver",
     version="0.1.0",
-    author="Your Name",
-    author_email="you@example.com",
-    description="A framework to orchestrate long-running LLM workflows with a persistent task tracker (Blueprint)",
-    url="https://github.com/yourusername/python-weaver",
+    author="Advait Shinde",
+    author_email="advaitss11@gmail.com",
+    description="A framework to orchestrate long-running LLM workflows with a persistent task tracker.",
+    url="https://github.com/adv-11/python-weaver",
     packages=find_packages(exclude=["tests", "examples"]),
     python_requires='>=3.7',  # Python 3.7+ includes sqlite3 in stdlib
     install_requires=[
