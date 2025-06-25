@@ -1,6 +1,6 @@
-
 [![PyPI version](https://img.shields.io/pypi/v/python-weaver.svg)](https://pypi.org/project/python-weaver)
 
+[![Architecture Diagram](architecture.png)]
 
 # python-weaver
 
