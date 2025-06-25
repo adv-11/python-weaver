@@ -26,7 +26,7 @@ def cli(ctx, api_key):
 @click.argument("project_name")
 @click.argument("project_goal")
 @click.pass_context
-@click.group()
+
 def cli():
     """python-weaver CLI: orchestrate long-duration LLM workflows."""
     pass
