@@ -4,7 +4,28 @@ import sys
 import click
 from weaver.project import Project
 from weaver.exceptions import WeaverError
+from weaver.config import get_openai_api_key
 
+@click.group()
+@click.option(
+    "--api-key", "-k",
+    help="Your OpenAI API key (overrides env or config file).",
+)
+@click.pass_context
+def cli(ctx, api_key):
+    """
+    python-weaver CLI.
+    """
+    # Resolve and stash the key in context
+    ctx.ensure_object(dict)
+    ctx.obj["OPENAI_API_KEY"] = get_openai_api_key(api_key)
+
+# Then in commands where you call litellm or any SDK, inject ctx.obj["OPENAI_API_KEY"]
+# For example:
+@cli.command()
+@click.argument("project_name")
+@click.argument("project_goal")
+@click.pass_context
 @click.group()
 def cli():
     """python-weaver CLI: orchestrate long-duration LLM workflows."""

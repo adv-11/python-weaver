@@ -17,6 +17,8 @@ setup(
         "PyPDF2",
         "click",
         "backoff",
+        "toml",
+        "python-dotenv",
     ],
     extras_require={
         "dev": ["pytest"]
