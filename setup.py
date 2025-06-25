@@ -14,7 +14,9 @@ setup(
         "pandas",
         "beautifulsoup4",
         "requests",
-        "PyPDF2"
+        "PyPDF2",
+        "click",
+        "backoff",
     ],
     extras_require={
         "dev": ["pytest"]
