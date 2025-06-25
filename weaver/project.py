@@ -28,12 +28,11 @@ class Project:
         self.meta_path = self.project_dir / "project.json"
 
         if project_goal is not None:
-            # Initialize new project
-            if self.project_dir.exists():
-                raise WeaverError(f"Project '{project_name}' already exists.")
-            self.project_dir.mkdir(parents=True)
+
+            # Only error if metadata already exists
             if self.meta_path.exists():
                 raise WeaverError(f"Project metadata file '{self.meta_path}' already exists.")
+            
             self.project_dir.mkdir(exist_ok=True)
             self.sources_dir.mkdir()
             self.results_dir.mkdir()
