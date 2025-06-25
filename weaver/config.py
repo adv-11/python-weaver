@@ -53,3 +53,13 @@ def get_openai_api_key(cli_key: str = None) -> str:
         "Missing OpenAI API key: please supply via --api-key, "
         "set OPENAI_API_KEY, or add it to weaver.toml under [credentials]."
     )
+
+def get_model_config(key: str) -> dict:
+    """
+    Retrieve the configuration dict for the given llm_config_key.
+    Raises KeyError if the key is missing.
+    """
+    try:
+        return LLM_CONFIG["available_llms"][key]
+    except KeyError as e:
+        raise KeyError(f"LLM config key '{key}' not found in LLM_CONFIG.") from e

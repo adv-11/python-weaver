@@ -21,7 +21,7 @@ def bp(tmp_path, monkeypatch):
 
 def test_execute_success(tmp_path, bp, monkeypatch):
     # Add a simple task
-    tid = bp.add_task("T", "gpt-4-turbo", "Hello")
+    tid = bp.add_task("T", "gpt-4o-mini", "Hello")
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
     # Mock LLM
     dummy = DummyResponse("OK", {"prompt_tokens": 10, "completion_tokens": 5})
@@ -35,7 +35,7 @@ def test_execute_success(tmp_path, bp, monkeypatch):
     assert rec["cost"] > 0
 
 def test_execute_failure(tmp_path, bp, monkeypatch):
-    tid = bp.add_task("T", "gpt-4-turbo", "Hello")
+    tid = bp.add_task("T", "gpt-4o-mini", "Hello")
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
     # Mock LLM to always raise
     def bad(*args, **kw): raise RuntimeError("API down")

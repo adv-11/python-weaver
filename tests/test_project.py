@@ -46,7 +46,7 @@ def test_ingest_and_plan(tmp_project, monkeypatch):
 def test_run_with_steps(tmp_project, monkeypatch):
     # Create project + blueprint manually
     p = Project(tmp_project, project_goal="G")
-    p.blueprint.add_task("A", "gpt-4-turbo", "Hello")
+    p.blueprint.add_task("A", "gpt-4o-mini", "Hello")
     # Stub Agent.execute_task to just mark task complete
     class DummyAgent:
         def __init__(self, b, g):

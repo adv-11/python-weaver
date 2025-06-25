@@ -15,7 +15,7 @@ def bp(tmp_path):
 def test_add_and_get_task(bp):
     tid = bp.add_task(
         task_name="T1",
-        llm_config_key="gpt-4-turbo",
+        llm_config_key="gpt-4o-mini",
         prompt_template="Do X",
     )
     rec = bp.get_task(tid)
@@ -24,14 +24,14 @@ def test_add_and_get_task(bp):
     assert rec["prompt_template"] == "Do X"
 
 def test_update_and_status(bp):
-    tid = bp.add_task("T2", "gpt-4-turbo", "Do Y")
+    tid = bp.add_task("T2", "gpt-4o-mini", "Do Y")
     bp.update_task_status(tid, "in_progress")
     assert bp.get_task(tid)["status"] == "in_progress"
 
 def test_dependency_resolution(bp):
     # Task 1 (no deps), Task 2 depends on 1
-    t1 = bp.add_task("T1", "gpt-4-turbo", "A")
-    t2 = bp.add_task("T2", "gpt-4-turbo", "B", dependencies=str(t1))
+    t1 = bp.add_task("T1", "gpt-4o-mini", "A")
+    t2 = bp.add_task("T2", "gpt-4o-mini", "B", dependencies=str(t1))
     # Only t1 is ready
     next1 = bp.get_next_pending_task()
     assert next1["task_id"] == t1
@@ -42,8 +42,8 @@ def test_dependency_resolution(bp):
 
 def test_to_from_csv(tmp_path, bp):
     # Add two tasks
-    tid1 = bp.add_task("T1", "gpt-4-turbo", "A")
-    tid2 = bp.add_task("T2", "gpt-4-turbo", "B", dependencies=str(tid1))
+    tid1 = bp.add_task("T1", "gpt-4o-mini", "A")
+    tid2 = bp.add_task("T2", "gpt-4o-mini", "B", dependencies=str(tid1))
     csvf = tmp_path / "bp.csv"
     bp.to_csv(str(csvf))
     # Edit CSV: change T2 name
