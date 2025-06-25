@@ -173,7 +173,7 @@ Please output JSON in the format:
 
             # write per-task result file
             record = self.blueprint.get_task(task_id)
-            raw = record.get("raw_result", "")
+            raw = record.get("raw_result") or ""
             (self.results_dir / f"{task_id}.txt").write_text(raw, encoding="utf-8")
 
             # human feedback loop

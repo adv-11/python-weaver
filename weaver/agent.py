@@ -64,7 +64,7 @@ class Agent:
         last_error = None
         for attempt in range(1, 4):
             try:
-                response = litellm.llm_completion(
+                response = litellm.completion(
                     model=model_cfg["model"],
                     prompt=prompt,
                     max_tokens=model_cfg.get("max_tokens")

@@ -150,24 +150,38 @@ class Blueprint:
 
     def update_task_execution_details(
         self,
-        task_id: int,
-        final_prompt: str,
-        raw_result: str,
-        cost: float,
-        parsed_result: str = None
-    ) -> None:
+        task_id,
+        final_prompt=None,
+        raw_result=None,
+        parsed_result=None,
+        cost=None,
+        execution_start_timestamp=None,
+        execution_end_timestamp=None,
+        retry_count=None,
+        error_log=None
+    ):
         """
-        Save the results of an LLM execution, timestamps, cost, and set awaiting_human_approval.
+        Update any of these fields on a task. Only non-None args will be written.
         """
-        end_ts = datetime.utcnow().isoformat()
-        sql = (
-            "UPDATE tasks SET final_prompt = ?, raw_result = ?, parsed_result = ?, "
-            "cost = ?, execution_end_timestamp = ?, status = 'awaiting_human_approval' "
-            "WHERE task_id = ?"
-        )
-        parsed = parsed_result if parsed_result is not None else raw_result
-        self._execute_query(sql, (final_prompt, raw_result, parsed, cost, end_ts, task_id))
-        self.conn.commit()
+        updates = {}
+        if final_prompt    is not None: updates['final_prompt']    = final_prompt
+        if raw_result      is not None: updates['raw_result']      = raw_result
+        if parsed_result   is not None: updates['parsed_result']   = parsed_result
+        if cost             is not None: updates['cost']            = cost
+        if execution_start_timestamp is not None:
+            updates['execution_start_timestamp'] = execution_start_timestamp
+        if execution_end_timestamp   is not None:
+            updates['execution_end_timestamp']   = execution_end_timestamp
+        if retry_count      is not None: updates['retry_count']      = retry_count
+        if error_log        is not None: updates['error_log']        = error_log
+
+        if not updates:
+            return
+
+        set_clause = ", ".join(f"{col} = ?" for col in updates)
+        params     = list(updates.values()) + [task_id]
+        sql = f"UPDATE tasks SET {set_clause} WHERE task_id = ?"
+        self._execute_query(sql, params=params)
 
     def to_csv(self, filepath: str) -> None:
         """
