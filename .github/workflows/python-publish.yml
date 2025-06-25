@@ -1,0 +1,61 @@
+# .github/workflows/python-publish.yml
+name: "Publish python-weaver to PyPI"
+
+on:
+  release:
+    types: [published]  # Trigger on GitHub Release publication :contentReference[oaicite:11]{index=11}
+
+permissions:
+  contents: read      # Needed to fetch source code
+  id-token: write     # Enable OIDC token for Trusted Publishing :contentReference[oaicite:12]{index=12}
+
+jobs:
+  release-build:
+    name: Build Distributions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # Official checkout action :contentReference[oaicite:13]{index=13}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5  # Official Python setup :contentReference[oaicite:14]{index=14}
+        with:
+          python-version: '3.x'
+
+      - name: Install build dependencies
+        run: python -m pip install --upgrade pip build setuptools wheel
+
+      - name: Build distributions
+        run: python -m build --sdist --wheel --outdir dist  # Build both sdist & wheel :contentReference[oaicite:15]{index=15}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4  # Store dist/ for later steps :contentReference[oaicite:16]{index=16}
+        with:
+          name: release-dists
+          path: dist/
+
+  pypi-publish:
+    name: Publish to PyPI
+    needs: release-build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: pypi
+      url: https://pypi.org/project/python-weaver/  # PyPI project URL
+
+    permissions:
+      contents: read
+      id-token: write     # Mandatory for secretless publishing :contentReference[oaicite:17]{index=17}
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4  # Retrieve dist/ from build job :contentReference[oaicite:18]{index=18}
+        with:
+          name: release-dists
+          path: dist/
+
+      - name: Publish distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1  # Official PyPA publish action :contentReference[oaicite:19]{index=19}
+        with:
+          packages-dir: dist/  # directory containing .tar.gz and .whl files :contentReference[oaicite:20]{index=20}
