@@ -32,6 +32,9 @@ class Project:
             if self.project_dir.exists():
                 raise WeaverError(f"Project '{project_name}' already exists.")
             self.project_dir.mkdir(parents=True)
+            if self.meta_path.exists():
+                raise WeaverError(f"Project metadata file '{self.meta_path}' already exists.")
+            self.project_dir.mkdir(exist_ok=True)
             self.sources_dir.mkdir()
             self.results_dir.mkdir()
             # Save metadata

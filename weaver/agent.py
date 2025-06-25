@@ -5,8 +5,7 @@ Agent: Executes individual tasks via an LLM, handling retries and updating the B
 
 import time
 from datetime import datetime
-from litellm import completion as llm_completion
-
+import litellm
 from weaver.config import get_model_config
 from weaver.exceptions import AgentError
 
@@ -65,7 +64,7 @@ class Agent:
         last_error = None
         for attempt in range(1, 4):
             try:
-                response = llm_completion(
+                response = litellm.llm_completion(
                     model=model_cfg["model"],
                     prompt=prompt,
                     max_tokens=model_cfg.get("max_tokens")
