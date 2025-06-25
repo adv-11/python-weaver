@@ -6,6 +6,8 @@ requests
 PyPDF2
 click>=8.0
 backoff>=2.0
+toml
+python-dotenv
 # sqlite3 is part of the Python standard library (no separate install needed)
 
 # For development and testing

@@ -10,7 +10,7 @@ from weaver.agent import Agent
 from weaver.config import LLM_CONFIG
 from weaver.exceptions import WeaverError
 from weaver.connectors.pdf_reader import PDFReader
-from weaver.connectors.url_scraper import URLScraper
+from weaver.connectors.url_scraper import URLScraper  
 from weaver.connectors.base_connector import BaseConnector
 
 
