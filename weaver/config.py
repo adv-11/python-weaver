@@ -4,7 +4,23 @@ import toml
 from typing import Any, Dict
 
 CONFIG_FILENAMES = ["weaver.toml", ".weaverrc"]
-
+LLM_CONFIG = {
+    "main_orchestrator": os.getenv("WEAVER_ORCHESTRATOR", "gpt-4o-mini"),
+    "available_llms": {
+        "gpt-4o-mini": {
+            "model": "openai/gpt-4o-mini",
+            "max_tokens": 8192,
+            "cost_per_1k_tokens": {"prompt": 0.0015, "completion": 0.0020},
+            
+        },
+        "gemini-1.5-pro": {
+            "model": "gemini/gemini-1.5-pro",
+            "max_tokens": 8192,
+            "cost_per_1k_tokens": {"prompt": 0.0020, "completion": 0.0025},
+        },
+        # Users can add more models here…
+    },
+}
 def _load_file_config() -> Dict[str, Any]:
     for name in CONFIG_FILENAMES:
         path = Path(name)

@@ -7,7 +7,7 @@ setup(
     author_email="advaitss11@gmail.com",
     description="A framework to orchestrate long-running LLM workflows with a persistent task tracker.",
     url="https://github.com/adv-11/python-weaver",
-    packages=find_packages(exclude=["tests", "examples"]),
+    packages=find_packages(include=['weaver.connectors'],exclude=["tests", "examples"]),
     python_requires='>=3.7',  # Python 3.7+ includes sqlite3 in stdlib
     install_requires=[
         "litellm",
