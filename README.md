@@ -1,3 +1,7 @@
+
+[![PyPI version](https://img.shields.io/pypi/v/python-weaver.svg)](https://pypi.org/project/python-weaver)
+
+
 # python-weaver
 
 _python-weaver_ is an open-source Python framework designed to enable Large Language Models (LLMs) to execute complex, long-duration tasks by orchestrating workflows through a persistent, human-editable task tracker called the **Blueprint**.
