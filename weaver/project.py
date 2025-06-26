@@ -1,13 +1,11 @@
-# weaver/project.py
-
 import json
 import shutil
 from pathlib import Path
-from litellm import completion as llm_completion
+import litellm
 
 from weaver.blueprint import Blueprint
 from weaver.agent import Agent
-from weaver.config import LLM_CONFIG
+from weaver.config import LLM_CONFIG, get_model_config
 from weaver.exceptions import WeaverError
 from weaver.connectors.pdf_reader import PDFReader
 from weaver.connectors.url_scraper import URLScraper  
@@ -28,7 +26,6 @@ class Project:
         self.meta_path = self.project_dir / "project.json"
 
         if project_goal is not None:
-
             # Only error if metadata already exists
             if self.meta_path.exists():
                 raise WeaverError(f"Project metadata file '{self.meta_path}' already exists.")
@@ -95,10 +92,12 @@ class Project:
             texts.append(txt.read_text(encoding="utf-8"))
         combined_sources = "\n\n".join(texts)
 
-        # 2) Build planning prompt
+        # 2) Get orchestrator model configuration
         orchestrator_key = LLM_CONFIG["main_orchestrator"]
-        orchestrator_model = LLM_CONFIG["available_llms"][orchestrator_key]["model"]
+        orchestrator_config = get_model_config(orchestrator_key)
+        orchestrator_model = orchestrator_config["model"]
 
+        # 3) Build planning prompt
         planning_prompt = f"""
 You are an expert project planner.
 
@@ -122,20 +121,25 @@ Please output JSON in the format:
 }}
 """
 
-        # 3) Call LLM
-        resp = llm_completion(
-            model=orchestrator_model,
-            prompt=planning_prompt,
-            max_tokens=2000
-        )
-        content = resp["choices"][0]["message"]["content"]
+        # 4) Call LLM using litellm
+        try:
+            resp = litellm.completion(
+                model=orchestrator_model,
+                messages=[{"role": "user", "content": planning_prompt}],
+                max_tokens=orchestrator_config.get("max_tokens", 2000)
+            )
+            content = resp["choices"][0]["message"]["content"]
+        except Exception as e:
+            raise WeaverError(f"Failed to call orchestrator LLM: {e}")
+
+        # 5) Parse response
         try:
             plan = json.loads(content)
             tasks = plan["tasks"]
         except Exception as e:
             raise WeaverError(f"Failed to parse plan JSON: {e}")
 
-        # 4) Populate blueprint (1-based task_ids)
+        # 6) Populate blueprint (1-based task_ids)
         llm_keys = list(LLM_CONFIG["available_llms"].keys())
         for idx, task in enumerate(tasks, start=1):
             deps = ",".join(str(d + 1) for d in task.get("dependencies", []))
@@ -148,7 +152,7 @@ Please output JSON in the format:
                 dependencies=deps
             )
 
-        # 5) Export for human editing
+        # 7) Export for human editing
         self.blueprint.to_csv(str(self.project_dir / "blueprint.csv"))
 
     def run(self, human_feedback: bool = True, steps: int = 0):
@@ -179,7 +183,7 @@ Please output JSON in the format:
             if human_feedback:
                 csv_path = self.project_dir / "blueprint.csv"
                 self.blueprint.to_csv(str(csv_path))
-                input(f"[WEAVER] Task {task_id} complete. Edited blueprint.csv and press Enter to continue…")
+                input(f"[WEAVER] Task {task_id} complete. Edit blueprint.csv and press Enter to continue…")
                 try:
                     self.blueprint.import_from_csv(str(csv_path))
                 except Exception as e:

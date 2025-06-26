@@ -1,8 +1,6 @@
 """
 Agent: Executes individual tasks via an LLM, handling retries and updating the Blueprint.
 """
-# weaver/agent.py
-
 import time
 from datetime import datetime
 import litellm
@@ -62,17 +60,23 @@ class Agent:
 
         # 2) Attempt LLM call with retries
         last_error = None
+        response = None
+        
         for attempt in range(1, 4):
             try:
+                # Use litellm.completion with the model name directly
+                # litellm handles provider routing and authentication
                 response = litellm.completion(
                     model=model_cfg["model"],
-                    prompt=prompt,
+                    messages=[{"role": "user", "content": prompt}],
                     max_tokens=model_cfg.get("max_tokens")
                 )
                 break
             except Exception as e:
                 last_error = e
-                time.sleep(2 ** attempt)  # exponential backoff
+                print(f"[weaver] Task {task_id} attempt {attempt} failed: {e}")
+                if attempt < 3:
+                    time.sleep(2 ** attempt)  # exponential backoff
         else:
             # 3a) All retries failed: record failure
             err_msg = str(last_error)
@@ -93,6 +97,8 @@ class Agent:
         usage = response.get("usage", {})
         prompt_tokens = usage.get("prompt_tokens", 0)
         completion_tokens = usage.get("completion_tokens", 0)
+        
+        # Calculate costs using the model's rate information
         rates = model_cfg.get("cost_per_1k_tokens", {})
         cost = (
             prompt_tokens / 1_000 * rates.get("prompt", 0) +

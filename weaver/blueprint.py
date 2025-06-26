@@ -44,6 +44,8 @@ class Blueprint:
         except Exception as e:
             raise DatabaseError(f"Failed to connect to SQLite DB at '{db_path}': {e}")
 
+
+    
     def _initialize_table(self) -> None:
         """
         Create tasks table if not exists, according to the defined schema.
@@ -105,8 +107,6 @@ class Blueprint:
         row = self._execute_query(sql, (task_id,), fetch='one')
         if not row:
             return None
-        cols = [col[0] for col in self.conn.cursor().description] if False else []
-        # Actually get column names via PRAGMA
         cols = [info[1] for info in self._execute_query("PRAGMA table_info(tasks)", fetch='all')]
         return dict(zip(cols, row))
 

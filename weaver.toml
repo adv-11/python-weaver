@@ -1,0 +1,31 @@
+# Example weaver.toml configuration file
+# Place this in your project root or home directory
+
+# litellm-specific configuration
+[litellm]
+# Enable verbose logging for debugging
+set_verbose = true
+
+# Drop parameters that aren't supported by certain providers
+drop_params = true
+
+# Custom API bases for different providers (optional)
+[api_bases]
+# Use a custom OpenAI-compatible endpoint
+# openai = "https://api.custom-openai.com/v1"
+
+# Use Azure OpenAI
+# azure = "https://your-resource.openai.azure.com"
+
+# Example credentials (these would typically be set as environment variables instead)
+# [credentials]
+# openai_api_key = "sk-..."
+# anthropic_api_key = "sk-ant-..."
+# google_api_key = "AI..."
+
+# Note: It's recommended to use environment variables for credentials:
+# export OPENAI_API_KEY="sk-..."
+# export ANTHROPIC_API_KEY="sk-ant-..."
+# export GOOGLE_API_KEY="AI..."
+# export AZURE_API_KEY="..."
+# export COHERE_API_KEY="..."

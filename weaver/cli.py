@@ -1,35 +1,23 @@
-# weaver/cli.py
-
 import sys
 import click
 from weaver.project import Project
 from weaver.exceptions import WeaverError
-from weaver.config import get_openai_api_key
+from weaver.config import check_environment, get_missing_credentials
 
 @click.group()
-@click.option(
-    "--api-key", "-k",
-    help="Your OpenAI API key (overrides env or config file).",
-)
 @click.pass_context
-def cli(ctx, api_key):
+def cli(ctx):
     """
-    python-weaver CLI.
+    python-weaver CLI: orchestrate long-duration LLM workflows.
     """
-    # Resolve and stash the key in context
     ctx.ensure_object(dict)
-    ctx.obj["OPENAI_API_KEY"] = get_openai_api_key(api_key)
-
-# Then in commands where you call litellm or any SDK, inject ctx.obj["OPENAI_API_KEY"]
-# For example:
-@cli.command()
-@click.argument("project_name")
-@click.argument("project_goal")
-@click.pass_context
-
-def cli():
-    """python-weaver CLI: orchestrate long-duration LLM workflows."""
-    pass
+    
+    # Check environment on startup
+    env_error = check_environment()
+    if env_error:
+        click.echo(f"[weaver][error] {env_error}", err=True)
+        click.echo("\nFor setup instructions, see: https://docs.litellm.ai/docs/providers", err=True)
+        sys.exit(1)
 
 @cli.command()
 @click.argument("project_name")
@@ -110,6 +98,34 @@ def run(project_name: str, no_human_feedback: bool, steps: int):
     except WeaverError as e:
         click.echo(f"[weaver][error] {e}", err=True)
         sys.exit(1)
+
+@cli.command()
+def check():
+    """
+    Check credential configuration for all providers.
+    """
+    missing = get_missing_credentials()
+    
+    if not missing:
+        click.echo("[weaver] ✓ All configured models have valid credentials.")
+        return
+    
+    click.echo("[weaver] Credential status:")
+    
+    # Show missing credentials
+    for provider, creds in missing.items():
+        cred_list = " or ".join(creds)
+        click.echo(f"  ❌ {provider}: Missing {cred_list}")
+    
+    # Show available models
+    from weaver.config import LLM_CONFIG, validate_model_credentials
+    click.echo("\n[weaver] Model availability:")
+    
+    for model_key in LLM_CONFIG["available_llms"]:
+        status = "✓" if validate_model_credentials(model_key) else "❌"
+        click.echo(f"  {status} {model_key}")
+    
+    click.echo("\nFor setup instructions, see: https://docs.litellm.ai/docs/providers")
 
 def main():
     cli()
