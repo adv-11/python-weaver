@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="python-weaver",
-    version="0.1.1",
+    version="0.1.3",
     author="Advait Shinde",
     author_email="advaitss11@gmail.com",
     description="A framework to orchestrate long-running LLM workflows with a persistent task tracker.",
