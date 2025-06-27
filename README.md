@@ -329,7 +329,7 @@ python-weaver/
 
 ### Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+could use all the help i can get. i'll make a contributing guide soon to help you easily navigate and develop! 
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
