@@ -28,10 +28,18 @@ class Agent:
         deps = task_record.get("dependencies")
         if deps:
             for dep_id in deps.split(","):
-                dep = self.blueprint.get_task(int(dep_id))
-                parsed = dep.get("parsed_result")
-                if parsed:
-                    parts.append(f"Dependency {dep_id} result:\n{parsed}\n")
+                dep_id = dep_id.strip()
+                if dep_id:  # skip empty strings
+                    try:
+                        # Handle both integer and float strings
+                        dep_id_int = int(float(dep_id))
+                        dep = self.blueprint.get_task(dep_id_int)
+                        parsed = dep.get("parsed_result")
+                        if parsed:
+                            parts.append(f"Dependency {dep_id_int} result:\n{parsed}\n")
+                    except (ValueError, TypeError):
+                        print(f"[weaver] Warning: Invalid dependency ID '{dep_id}', skipping.")
+                        continue
 
         parts.append(task_record.get("prompt_template", ""))
         return "\n".join(parts)
