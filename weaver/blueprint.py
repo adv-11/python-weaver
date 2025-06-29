@@ -215,6 +215,7 @@ class Blueprint:
         current = pd.read_sql_query("SELECT * FROM tasks", self.conn, index_col='task_id')
         incoming = df.set_index('task_id')
         updates = []  # list of (task_id, {col: new_val, ...})
+        
         for tid, row in incoming.iterrows():
             if tid not in current.index:
                 continue  # skip new tasks
@@ -223,12 +224,32 @@ class Blueprint:
                 if col in incoming.columns:
                     new_val = row[col]
                     old_val = current.at[tid, col]
+                    
+                    # Special handling for dependencies column
+                    if col == 'dependencies' and pd.notna(new_val):
+                        # Clean up dependencies: convert floats to ints
+                        if isinstance(new_val, (int, float)):
+                            new_val = str(int(new_val))
+                        elif isinstance(new_val, str):
+                            # Handle comma-separated dependencies
+                            deps = []
+                            for dep in new_val.split(','):
+                                dep = dep.strip()
+                                if dep:
+                                    try:
+                                        deps.append(str(int(float(dep))))
+                                    except (ValueError, TypeError):
+                                        print(f"[weaver] Warning: Invalid dependency '{dep}' in task {tid}")
+                            new_val = ','.join(deps) if deps else ''
+                    
                     if pd.notna(new_val) and new_val != old_val:
                         changes[col] = new_val
             if changes:
                 updates.append((tid, changes))
+                
         if not updates:
             return
+            
         # Apply in a single transaction
         try:
             self._execute_query("BEGIN TRANSACTION")
