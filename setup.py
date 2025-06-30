@@ -5,7 +5,7 @@ long_description = (this_directory / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="python-weaver",
-    version="0.1.4",
+    version="0.1.5",
     author="Advait Shinde",
     author_email="advaitss11@gmail.com",
     description="A framework to orchestrate long-running LLM workflows with a persistent task tracker.",
