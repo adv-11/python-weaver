@@ -38,7 +38,7 @@ def init(project_name: str, project_goal: str):
 
 @cli.command()
 @click.argument("project_name")
-@click.argument("sources", nargs=-1, type=click.Path(exists=True))
+@click.argument("sources", nargs=-1)
 def ingest(project_name: str, sources):
     """
     Ingest content into an existing project.
