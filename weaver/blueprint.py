@@ -126,7 +126,19 @@ class Blueprint:
         for task_id, deps_str in pending:
             if not deps_str:
                 return self.get_task(task_id)
-            dep_ids = [d.strip() for d in deps_str.split(',') if d.strip().isdigit()]
+            # dep_ids = [d.strip() for d in deps_str.split(',') if d.strip().isdigit()]
+
+            # better  handling of dependencies
+            dep_ids = []
+            for dep in deps_str.split(','):
+                d = dep.strip()
+                if d:
+                    try:
+                        dep_ids.append(int(float(d)))  # Handle "1.0" -> 1
+                    except (ValueError, TypeError):
+                        print(f"[weaver] Warning: Invalid dependency '{d}' in task {task_id}")
+                        continue
+
             if not dep_ids:
                 return self.get_task(task_id)
             # count completed deps
